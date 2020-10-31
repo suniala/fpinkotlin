@@ -5,18 +5,24 @@ import chapter3.Leaf
 import chapter3.Tree
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.WordSpec
-import utils.SOLUTION_HERE
 
 // tag::init[]
-fun <A> size(tree: Tree<A>): Int =
-
-    SOLUTION_HERE()
+/**
+Write a function size that counts the number of nodes (leaves and
+branches) in a tree.
+ */
+fun <A> size(tree: Tree<A>): Int {
+    fun go(rem: Tree<A>): Int = 1 + when (rem) {
+        is Leaf -> 0
+        is Branch -> go(rem.left) + go(rem.right)
+    }
+    return go(tree)
+}
 // end::init[]
 
-//TODO: Enable tests by removing `!` prefix
 class Exercise24 : WordSpec({
     "tree size" should {
-        "!determine the total size of a tree" {
+        "determine the total size of a tree" {
             val tree =
                 Branch(
                     Branch(Leaf(1), Leaf(2)),

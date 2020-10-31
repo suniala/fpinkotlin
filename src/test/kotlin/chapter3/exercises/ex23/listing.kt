@@ -1,26 +1,48 @@
 package chapter3.exercises.ex23
 
+import chapter3.Cons
 import chapter3.List
+import chapter3.Nil
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.WordSpec
-import utils.SOLUTION_HERE
 
 // tag::startsWith[]
+/**
+As an example, implement hasSubsequence for checking whether a List
+contains another List as a subsequence. For instance, List(1,2,3,4)
+would have List(1,2) , List(2,3) , and List(4) as subsequences, among
+others. You may have some difficulty finding a concise purely functional
+implementation that is also efficient. That’s okay. Implement the function
+however comes most naturally. We’ll return to this implementation in
+chapter 5 and hopefully improve on it.
+ */
 tailrec fun <A> startsWith(l1: List<A>, l2: List<A>): Boolean =
-
-    SOLUTION_HERE()
+    when (l1) {
+        is Nil -> true
+        is Cons -> when (l2) {
+            is Nil -> true
+            is Cons -> if (l1.head != l2.head) false
+            else startsWith(l1.tail, l2.tail)
+        }
+    }
 // end::startsWith[]
 
 // tag::init[]
-tailrec fun <A> hasSubsequence(xs: List<A>, sub: List<A>): Boolean =
-
-    SOLUTION_HERE()
+tailrec fun <A> hasSubsequence(xs: List<A>, sub: List<A>): Boolean {
+    return when (xs) {
+        is Nil -> false
+        is Cons -> when (sub) {
+            is Nil -> true
+            is Cons -> if (startsWith(xs, sub)) true
+            else hasSubsequence(xs.tail, sub)
+        }
+    }
+}
 // end::init[]
 
-//TODO: Enable tests by removing `!` prefix
 class Exercise23 : WordSpec({
     "list subsequence" should {
-        "!determine if a list starts with" {
+        "determine if a list starts with" {
             val xs = List.of(1, 2, 3)
             startsWith(xs, List.of(1)) shouldBe true
             startsWith(xs, List.of(1, 2)) shouldBe true
@@ -30,7 +52,7 @@ class Exercise23 : WordSpec({
             startsWith(xs, List.of(6)) shouldBe false
         }
 
-        "!identify subsequences of a list" {
+        "identify subsequences of a list" {
             val xs = List.of(1, 2, 3, 4, 5)
             hasSubsequence(xs, List.of(1)) shouldBe true
             hasSubsequence(xs, List.of(1, 2)) shouldBe true

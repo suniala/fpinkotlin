@@ -1,21 +1,26 @@
 package chapter3.exercises.ex13
 
+import chapter3.Cons
 import chapter3.List
+import chapter3.exercises.ex11.reverse
+import chapter3.exercises.ex7.foldRight
+import chapter3.exercises.ex9.foldLeft
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.WordSpec
-import utils.SOLUTION_HERE
 
 // tag::init[]
+/**
+Implement append in terms of either foldLeft or foldRight.
+ */
 fun <A> append(a1: List<A>, a2: List<A>): List<A> =
-
-    SOLUTION_HERE()
+    foldRight(a1, a2) { a, b -> Cons(a, b) }
 // end::init[]
 
-fun <A> appendL(a1: List<A>, a2: List<A>): List<A> = SOLUTION_HERE()
+fun <A> appendL(a1: List<A>, a2: List<A>): List<A> =
+    foldLeft(reverse(a1), a2) { b, a -> Cons(a, b) }
 
-//TODO: Enable tests by removing `!` prefix
 class Exercise13 : WordSpec({
-    "!list append" should {
+    "list append" should {
         "append two lists to each other using foldRight" {
             append(
                 List.of(1, 2, 3),
@@ -24,7 +29,7 @@ class Exercise13 : WordSpec({
         }
     }
 
-    "!list appendL" should {
+    "list appendL" should {
         "append two lists to each other using foldLeft" {
             appendL(
                 List.of(1, 2, 3),

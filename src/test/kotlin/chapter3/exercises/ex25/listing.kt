@@ -5,18 +5,23 @@ import chapter3.Leaf
 import chapter3.Tree
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.WordSpec
-import utils.SOLUTION_HERE
 
 // tag::init[]
-fun maximum(tree: Tree<Int>): Int =
-
-    SOLUTION_HERE()
+/**
+Write a function maximum that returns the maximum element in a Tree<Int> .
+ */
+fun maximum(tree: Tree<Int>): Int {
+    fun go(acc: Int, rem: Tree<Int>): Int = when (rem) {
+        is Leaf -> maxOf(acc, rem.value)
+        is Branch -> maxOf(acc, maxOf(go(acc, rem.left), go(acc, rem.right)))
+    }
+    return go(Int.MIN_VALUE, tree)
+}
 // end::init[]
 
-//TODO: Enable tests by removing `!` prefix
 class Exercise25 : WordSpec({
     "tree maximum" should {
-        "!determine the maximum value held in a tree" {
+        "determine the maximum value held in a tree" {
             val tree = Branch(
                 Branch(Leaf(1), Leaf(9)),
                 Branch(Leaf(3), Leaf(4))
