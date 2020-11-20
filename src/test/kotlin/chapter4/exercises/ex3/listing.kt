@@ -5,15 +5,18 @@ import chapter4.Option
 import chapter4.Some
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.WordSpec
-import utils.SOLUTION_HERE
 
 //tag::init[]
+/**
+Write a generic function, map2 that combines two Option values using a
+binary function. If either Option value is None , then the return value is too.
+ */
 fun <A, B, C> map2(a: Option<A>, b: Option<B>, f: (A, B) -> C): Option<C> =
-
-    SOLUTION_HERE()
+    a
+        .map { sa -> fun(sb: B): C = f(sa, sb) }
+        .flatMap { b.map(it) }
 //end::init[]
 
-//TODO: Enable tests by removing `!` prefix
 class Exercise3 : WordSpec({
 
     "map2" should {
@@ -22,13 +25,13 @@ class Exercise3 : WordSpec({
         val b = Some(20)
         val none = Option.empty<Int>()
 
-        "!combine two option values using a binary function" {
+        "combine two option values using a binary function" {
             map2(a, b) { aa, bb ->
                 aa * bb
             } shouldBe Some(100)
         }
 
-        "!return none if either option is not defined" {
+        "return none if either option is not defined" {
             map2(a, none) { aa, bb ->
                 aa * bb
             } shouldBe None
