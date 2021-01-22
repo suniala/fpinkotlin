@@ -7,7 +7,16 @@ import io.kotlintest.shouldBe
 import io.kotlintest.specs.WordSpec
 import utils.SOLUTION_HERE
 
-//TODO: Enable tests by removing `!` prefix
+/**
+Generalize tails to the function scanRight , which is like a foldRight that
+returns a stream of the intermediate results. For example:
+
+>>> Stream.of(1, 2, 3).scanRight(0, { a, b -> a + b }).toList()
+res1: chapter3.List<kotlin.Int> = Cons(head=6, tail=Cons(head=5,
+tail=Cons(head=3,
+tail=Cons(head=0,
+tail=Nil))))
+ */
 class Exercise16 : WordSpec({
 
     //tag::scanright[]
