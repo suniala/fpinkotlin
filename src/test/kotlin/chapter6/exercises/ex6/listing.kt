@@ -1,28 +1,28 @@
 package chapter6.exercises.ex6
 
-// import chapter6.RNG
 import chapter6.Rand
 import chapter6.rng1
 import chapter6.unit
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.WordSpec
-import utils.SOLUTION_HERE
 
-//TODO: Enable tests by removing `!` prefix
+/**
+Write the implementation of map2 based on the following signature. This
+function takes two actions, ra and rb , and a function f for combining their
+results, and returns a new action that combines them:
+ */
 class Exercise6 : WordSpec({
 
     //tag::init[]
-    fun <A, B, C> map2(
-        ra: Rand<A>,
-        rb: Rand<B>,
-        f: (A, B) -> C
-    ): Rand<C> =
-
-        SOLUTION_HERE()
+    fun <A, B, C> map2(ra: Rand<A>, rb: Rand<B>, f: (A, B) -> C): Rand<C> = { rng ->
+        val (rav, rng2) = ra(rng)
+        val (rbv, rng3) = rb(rng2)
+        Pair(f(rav, rbv), rng3)
+    }
     //end::init[]
 
     "map2" should {
-        "!combine the results of two actions" {
+        "combine the results of two actions" {
 
             val combined: Rand<String> =
                 map2(

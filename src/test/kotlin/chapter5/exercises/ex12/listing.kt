@@ -10,6 +10,11 @@ import chapter5.toList
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.WordSpec
 
+object Constant {
+    fun <A> constant(a: A): Stream<A> =
+        unfold(None) { Some(Pair(a, None)) }
+}
+
 /**
 Write fibs , from , constant , and ones in terms of unfold .
  */
@@ -24,7 +29,7 @@ class Exercise12 : WordSpec({
     //end::from[]
 
     //tag::constant[]
-    fun <A> constant(a: A): Stream<A> = unfold(None) { Some(Pair(a, None)) }
+    fun <A> constant(a: A): Stream<A> = Constant.constant(a)
     //end::constant[]
 
     //tag::ones[]
