@@ -3,8 +3,11 @@ package chapter9.exercises.ex1
 import chapter9.ParseError
 import chapter9.solutions.final.Parser
 import chapter9.solutions.final.ParserDsl
-import utils.SOLUTION_HERE
 
+/**
+Using product , implement the now-familiar combinator map2 . In turn, use this to
+implement many1 in terms of many .
+ */
 abstract class Listing : ParserDsl<ParseError>() {
 
     //tag::init1[]
@@ -13,13 +16,13 @@ abstract class Listing : ParserDsl<ParseError>() {
         pb: () -> Parser<B>,
         f: (A, B) -> C
     ): Parser<C> =
-
-        SOLUTION_HERE()
+        pa.product(pb).map { (a, b) -> f(a, b) }
     //end::init1[]
 
     //tag::init2[]
     override fun <A> many1(p: Parser<A>): Parser<List<A>> =
-
-        SOLUTION_HERE()
+        map2(p, { many(p) }) { a, b ->
+            a.cons(b)
+        }
     //end::init2[]
 }

@@ -3,21 +3,24 @@ package chapter9.exercises.ex3
 import chapter9.solutions.final.ParseError
 import chapter9.solutions.final.Parser
 import chapter9.solutions.final.ParserDsl
-import utils.SOLUTION_HERE
 
+/**
+Hard: Before continuing, see if you can define many in terms of or , map2 , and succeed .
+ */
 abstract class Listing : ParserDsl<ParseError>() {
 
     fun <A, B, C> map2(
         pa: Parser<A>,
         pb: Parser<B>,
         f: (A, B) -> C
-    ): Parser<C> = TODO()
+    ): Parser<C> = (pa product { pb }).map { (a, b) -> f(a, b) }
 
     init {
         //tag::init1[]
         fun <A> many(pa: Parser<A>): Parser<List<A>> =
-
-            SOLUTION_HERE()
+            map2(pa, many(pa)) { a, la ->
+                a.cons(la)
+            } or succeed(emptyList())
         //end::init1[]
     }
 }

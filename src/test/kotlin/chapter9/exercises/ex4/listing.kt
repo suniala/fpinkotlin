@@ -3,8 +3,10 @@ package chapter9.exercises.ex4
 import chapter9.solutions.final.ParseError
 import chapter9.solutions.final.Parser
 import chapter9.solutions.final.ParserDsl
-import utils.SOLUTION_HERE
 
+/**
+Hard: Implement the listOfN combinator introduced earlier using map2 and succeed .
+ */
 abstract class Listing : ParserDsl<ParseError>() {
 
     fun <A, B, C> map2(
@@ -16,8 +18,10 @@ abstract class Listing : ParserDsl<ParseError>() {
     init {
         //tag::init1[]
         fun <A> listOfN(n: Int, pa: Parser<A>): Parser<List<A>> =
-
-            SOLUTION_HERE()
+            if (n < 1) succeed(emptyList())
+            else map2(pa, listOfN(n - 1, pa)) { a, al ->
+                a.cons(al)
+            }
         //end::init1[]
     }
 }
