@@ -5,6 +5,9 @@ import chapter9.solutions.final.Parser
 import chapter9.solutions.final.ParserDsl
 import utils.SOLUTION_HERE
 
+/**
+Implement product and map2 in terms of flatMap and map .
+ */
 abstract class Listing : ParserDsl<ParseError>() {
     init {
 
@@ -13,8 +16,11 @@ abstract class Listing : ParserDsl<ParseError>() {
             pa: Parser<A>,
             pb: Parser<B>
         ): Parser<Pair<A, B>> =
-
-            SOLUTION_HERE()
+            pa.flatMap { a ->
+                pb.map { b ->
+                    Pair(a, b)
+                }
+            }
         //end::init1[]
 
         //tag::init2[]
@@ -23,8 +29,11 @@ abstract class Listing : ParserDsl<ParseError>() {
             pb: Parser<B>,
             f: (A, B) -> C
         ): Parser<C> =
-
-            SOLUTION_HERE()
+            pa.flatMap { a ->
+                pb.map { b ->
+                    f(a, b)
+                }
+            }
         //end::init2[]
     }
 }
