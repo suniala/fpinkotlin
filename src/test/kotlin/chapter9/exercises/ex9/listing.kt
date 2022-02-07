@@ -97,15 +97,24 @@ abstract class JSONParsers : ParsersDsl<ParseError>() {
     /**
      * Matches the given token and consumes any preceding or following whitespace.
      */
-    private fun jtoken(token: String): Parser<Unit> =
+    private fun token(token: String): Parser<Unit> =
         whitespace()
             .many()
             .flatMap { string(token) }
             .flatMap { whitespace().many() }
             .map { }
 
+    private val keyValuePair: Parser<Pair<String, JSON>> =
+        quotedString()
+            .flatMap { key -> token(":").map { key } }
+            .flatMap { key ->
+                jsonParser.map { json ->
+                    Pair(key, json)
+                }
+            }
+
     private val jnull: Parser<JSON> =
-        jtoken("null").map { JNull as JSON }
+        token("null").map { JNull as JSON }
 
     private val jnumber: Parser<JSON> =
         regex("\\d+").map { JNumber(it.toDouble()) as JSON }
@@ -116,45 +125,36 @@ abstract class JSONParsers : ParsersDsl<ParseError>() {
         }
 
     private val jboolean: Parser<JSON> =
-        jtoken("true").map { JBoolean(true) as JSON } or
-            jtoken("false").map { JBoolean(false) as JSON }
+        token("true").map { JBoolean(true) as JSON } or
+            token("false").map { JBoolean(false) as JSON }
 
     private val jarray: Parser<JSON> =
-        jtoken("[")
+        token("[")
             .flatMap { jsonParser }
             .flatMap { first ->
-                jtoken(",")
+                token(",")
                     .flatMap { jsonParser }
                     .many()
                     .map { following -> listOf(first) + following }
             }
             .flatMap { jsons ->
-                jtoken("]")
+                token("]")
                     .map { JArray(jsons) as JSON }
             }
 
-    private val jkeyvalue: Parser<Pair<String, JSON>> =
-        quotedString()
-            .flatMap { key -> jtoken(":").map { key } }
-            .flatMap { key ->
-                jsonParser.map { json ->
-                    Pair(key, json)
-                }
-            }
-
     private val jobject: Parser<JSON> =
-        jtoken("{")
-            .flatMap { jkeyvalue }
+        token("{")
+            .flatMap { keyValuePair }
             .flatMap { first ->
-                jtoken(",")
-                    .flatMap { jkeyvalue }
+                token(",")
+                    .flatMap { keyValuePair }
                     .many()
                     .map { following -> listOf(first) + following }
             }
-            .flatMap { keyValuePairLists ->
+            .flatMap { keyValuePairList ->
                 string("}")
                     .map {
-                        JObject(keyValuePairLists.toMap()) as JSON
+                        JObject(keyValuePairList.toMap()) as JSON
                     }
             }
 
