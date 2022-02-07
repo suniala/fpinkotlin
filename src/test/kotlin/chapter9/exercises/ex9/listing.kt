@@ -71,6 +71,17 @@ abstract class Parsers<PE> {
 
     internal fun <A, B> map(pa: Parser<A>, f: (A) -> B): Parser<B> = TODO()
 
+    internal fun <A, B> product(
+        pa: Parser<A>,
+        pb: () -> Parser<B>
+    ): Parser<Pair<A, B>> = TODO()
+
+    internal fun <A, B> takeLeft(pab: Parser<Pair<A, B>>): Parser<A> =
+        TODO()
+
+    internal fun <A, B> takeRight(pab: Parser<Pair<A, B>>): Parser<B> =
+        TODO()
+
     internal fun whitespace(): Parser<Char> = TODO()
 
     /**
@@ -86,6 +97,13 @@ abstract class ParsersDsl<PE> : Parsers<PE>() {
 
     fun <A, B> Parser<A>.map(f: (A) -> B): Parser<B> = map(this, f)
 
+    infix fun <A, B> Parser<A>.product(pb: () -> Parser<B>): Parser<Pair<A, B>> =
+        product(this, pb)
+
+    fun <A, B> Parser<Pair<A, B>>.takeLeft() = takeLeft(this)
+
+    fun <A, B> Parser<Pair<A, B>>.takeRight() = takeRight(this)
+
     infix fun <A> Parser<A>.or(that: Parser<A>): Parser<A> =
         or(this) { that }
 
@@ -98,19 +116,18 @@ abstract class JSONParsers : ParsersDsl<ParseError>() {
      * Matches the given token and consumes any preceding or following whitespace.
      */
     private fun token(token: String): Parser<Unit> =
-        whitespace()
-            .many()
-            .flatMap { string(token) }
-            .flatMap { whitespace().many() }
-            .map { }
+        whitespace().many()
+            .product { string(token) }
+            .product { whitespace().many() }
+            .map {}
 
     private val keyValuePair: Parser<Pair<String, JSON>> =
         quotedString()
-            .flatMap { key -> token(":").map { key } }
-            .flatMap { key ->
-                jsonParser.map { json ->
-                    Pair(key, json)
-                }
+            .product { token(":") }
+            .takeLeft()
+            .product { jsonParser }
+            .map { (key, value) ->
+                Pair(key, value)
             }
 
     private val jnull: Parser<JSON> =
@@ -130,32 +147,35 @@ abstract class JSONParsers : ParsersDsl<ParseError>() {
 
     private val jarray: Parser<JSON> =
         token("[")
-            .flatMap { jsonParser }
-            .flatMap { first ->
+            .product { jsonParser }
+            .takeRight()
+            .product {
                 token(",")
-                    .flatMap { jsonParser }
+                    .product { jsonParser }
+                    .takeRight()
                     .many()
-                    .map { following -> listOf(first) + following }
             }
-            .flatMap { jsons ->
+            .product {
                 token("]")
-                    .map { JArray(jsons) as JSON }
             }
+            .takeLeft()
+            .map { (first, following) -> JArray(listOf(first) + following) as JSON }
 
     private val jobject: Parser<JSON> =
         token("{")
-            .flatMap { keyValuePair }
-            .flatMap { first ->
+            .product { keyValuePair }
+            .takeRight()
+            .product {
                 token(",")
-                    .flatMap { keyValuePair }
+                    .product { keyValuePair }
+                    .takeRight()
                     .many()
-                    .map { following -> listOf(first) + following }
             }
-            .flatMap { keyValuePairList ->
-                string("}")
-                    .map {
-                        JObject(keyValuePairList.toMap()) as JSON
-                    }
+            .map { (first, following) -> listOf(first) + following }
+            .product { token("}") }
+            .takeLeft()
+            .map { keyValuePairList ->
+                JObject(keyValuePairList.toMap()) as JSON
             }
 
     @Suppress("MemberVisibilityCanBePrivate")
