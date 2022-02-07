@@ -42,6 +42,7 @@ combinator declarations only. No implementations should appear in the final
 solution.
  */
 //tag::init[]
+@Suppress("UNUSED_PARAMETER")
 abstract class Parsers<PE> {
 
     // primitives
@@ -91,6 +92,7 @@ abstract class ParsersDsl<PE> : Parsers<PE>() {
     fun <A> Parser<A>.many(): Parser<List<A>> = many(this)
 }
 
+@Suppress("unused")
 abstract class JSONParsers : ParsersDsl<ParseError>() {
     private val jnull: Parser<JSON> =
         string("null").map { JNull as JSON }
@@ -156,6 +158,7 @@ abstract class JSONParsers : ParsersDsl<ParseError>() {
                     }
             }
 
+    @Suppress("MemberVisibilityCanBePrivate")
     val jsonParser: Parser<JSON> =
         jnull or jnumber or jstring or jboolean or jarray or jobject
 }
