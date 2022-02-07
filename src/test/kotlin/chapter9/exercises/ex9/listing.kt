@@ -71,7 +71,7 @@ abstract class Parsers<PE> {
 
     internal fun <A, B> map(pa: Parser<A>, f: (A) -> B): Parser<B> = TODO()
 
-    internal fun whitespace(): Parser<String> = TODO()
+    internal fun whitespace(): Parser<Char> = TODO()
 
     /**
      * Match a string value in quotes but return it without quotes
@@ -94,8 +94,18 @@ abstract class ParsersDsl<PE> : Parsers<PE>() {
 
 @Suppress("unused")
 abstract class JSONParsers : ParsersDsl<ParseError>() {
+    /**
+     * Matches the given token and consumes any preceding or following whitespace.
+     */
+    private fun jtoken(token: String): Parser<Unit> =
+        whitespace()
+            .many()
+            .flatMap { string(token) }
+            .flatMap { whitespace().many() }
+            .map { }
+
     private val jnull: Parser<JSON> =
-        string("null").map { JNull as JSON }
+        jtoken("null").map { JNull as JSON }
 
     private val jnumber: Parser<JSON> =
         regex("\\d+").map { JNumber(it.toDouble()) as JSON }
@@ -106,33 +116,26 @@ abstract class JSONParsers : ParsersDsl<ParseError>() {
         }
 
     private val jboolean: Parser<JSON> =
-        string("true").map { JBoolean(true) as JSON } or
-            string("false").map { JBoolean(false) as JSON }
+        jtoken("true").map { JBoolean(true) as JSON } or
+            jtoken("false").map { JBoolean(false) as JSON }
 
     private val jarray: Parser<JSON> =
-        string("[")
-            .flatMap { whitespace() }
+        jtoken("[")
             .flatMap { jsonParser }
             .flatMap { first ->
-                whitespace()
-                    .flatMap { string(",") }
-                    .flatMap { whitespace() }
+                jtoken(",")
                     .flatMap { jsonParser }
                     .many()
                     .map { following -> listOf(first) + following }
             }
             .flatMap { jsons ->
-                whitespace()
-                    .map { jsons }
-            }
-            .flatMap { jsons ->
-                string("]")
+                jtoken("]")
                     .map { JArray(jsons) as JSON }
             }
 
     private val jkeyvalue: Parser<Pair<String, JSON>> =
         quotedString()
-            .flatMap { key -> regex("\\s+:\\s+").map { key } }
+            .flatMap { key -> jtoken(":").map { key } }
             .flatMap { key ->
                 jsonParser.map { json ->
                     Pair(key, json)
@@ -140,13 +143,10 @@ abstract class JSONParsers : ParsersDsl<ParseError>() {
             }
 
     private val jobject: Parser<JSON> =
-        string("{")
-            .flatMap { whitespace() }
+        jtoken("{")
             .flatMap { jkeyvalue }
             .flatMap { first ->
-                whitespace()
-                    .flatMap { string(",") }
-                    .flatMap { whitespace() }
+                jtoken(",")
                     .flatMap { jkeyvalue }
                     .many()
                     .map { following -> listOf(first) + following }
