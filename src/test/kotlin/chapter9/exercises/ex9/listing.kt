@@ -1,5 +1,8 @@
 package chapter9.exercises.ex9
 
+import arrow.core.Tuple3
+import arrow.core.Tuple4
+
 sealed class JSON
 
 object JNull : JSON()
@@ -88,8 +91,15 @@ abstract class Parsers<PE> {
      * Match a string value in quotes but return it without quotes
      */
     internal fun quotedString(): Parser<String> = TODO()
+
+    internal fun digit(): Parser<Int> = TODO()
+
+    internal fun <A> optional(pa: Parser<A>): Parser<A?> = TODO()
+
+    internal fun char(c: Char): Parser<Char> = TODO()
 }
 
+@Suppress("unused")
 abstract class ParsersDsl<PE> : Parsers<PE>() {
     // syntactic sugar here
     fun <A, B> Parser<A>.flatMap(f: (A) -> Parser<B>): Parser<B> =
@@ -108,10 +118,30 @@ abstract class ParsersDsl<PE> : Parsers<PE>() {
         or(this) { that }
 
     fun <A> Parser<A>.many(): Parser<List<A>> = many(this)
+
+    fun <A> Parser<A>.slice(): Parser<String> = slice(this)
+
+    fun <A> Parser<A>.optional(): Parser<A?> = optional(this)
+
+    @JvmName("flattenABC")
+    internal fun <A, B, C> Parser<Pair<Pair<A, B>, C>>.flatten(): Parser<Tuple3<A, B, C>> =
+        TODO()
+
+    @JvmName("flattenABCD")
+    internal fun <A, B, C, D> Parser<Pair<Tuple3<A, B, C>, D>>.flatten(): Parser<Tuple4<A, B, C, D>> =
+        TODO()
 }
 
 @Suppress("unused")
 abstract class JSONParsers : ParsersDsl<ParseError>() {
+    @Suppress("UNUSED_PARAMETER")
+    private fun toDouble(
+        minusSign: Char?,
+        integerPart: String,
+        fractionPart: String?,
+        pwrOfTen: String?
+    ): Double = TODO()
+
     /**
      * Matches the given token and consumes any preceding or following whitespace.
      */
@@ -134,7 +164,35 @@ abstract class JSONParsers : ParsersDsl<ParseError>() {
         token("null").map { JNull as JSON }
 
     private val jnumber: Parser<JSON> =
-        regex("\\d+").map { JNumber(it.toDouble()) as JSON }
+        char('-')
+            .optional()
+            .product { digit().many().slice() }
+            .product {
+                char('.')
+                    .product {
+                        digit().many().slice()
+                    }
+                    .takeRight()
+                    .optional()
+            }
+            .flatten()
+            .product {
+                char('e')
+                    .product { digit().many().slice() }
+                    .takeRight()
+                    .optional()
+            }
+            .flatten()
+            .map { (minusSign, integerPart, fractionPart, pwrOfTen) ->
+                JNumber(
+                    toDouble(
+                        minusSign,
+                        integerPart,
+                        fractionPart,
+                        pwrOfTen
+                    )
+                ) as JSON
+            }
 
     private val jstring: Parser<JSON> =
         quotedString().map { withoutQuotes ->
