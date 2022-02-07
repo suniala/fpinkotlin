@@ -1,7 +1,5 @@
 package chapter9.exercises.ex9
 
-import utils.SOLUTION_HERE
-
 sealed class JSON
 
 object JNull : JSON()
@@ -15,39 +13,150 @@ object ParseError
 
 interface Parser<A>
 
+/**
+Hard: At this point, you are going to take over the design process. You’ll be creating
+Parser<JSON> from scratch using the primitives we’ve defined. You don’t need to
+worry about the representation of Parser just yet. As you go, you’ll undoubtedly dis-
+cover additional combinators and idioms, notice and factor out common patterns,
+and so on. Use the skills you’ve been developing throughout this book, and have fun!
+If you get stuck, you can always consult the tips in appendix A or the final solution in
+appendix B.
+
+Here are some basic guidelines to help you in the exercise:
+ Any general-purpose combinators you discover can be declared in the Parsers
+abstract class directly. These are top-level declarations with no implementation.
+ Any syntactic sugar can be placed in another abstract class called ParsersDsl
+that extends from Parsers . Make generous use of infix , along with anything
+else in your Kotlin bag of tricks to make the final JSONParser as easy to use as
+possible. The functions implemented here should all delegate to declarations
+in Parsers .
+ Any JSON-specific combinators can be added to JSONParser , which extends
+ParsersDsl .
+ You’ll probably want to introduce combinators that make it easier to parse the
+tokens of the JSON format (like string literals and numbers). For this, you can
+use the regex primitive we introduced earlier. You can also add a few primitives
+like letter , digit , whitespace , and so on to build up your token parsers.
+
+NOTE: This exercise is about defining the algebra consisting of primitive and
+combinator declarations only. No implementations should appear in the final
+solution.
+ */
 //tag::init[]
 abstract class Parsers<PE> {
 
     // primitives
 
-    internal abstract fun string(s: String): Parser<String>
+    internal fun string(s: String): Parser<String> = TODO()
 
-    internal abstract fun regex(r: String): Parser<String>
+    internal fun regex(r: String): Parser<String> = TODO()
 
-    internal abstract fun <A> slice(p: Parser<A>): Parser<String>
+    internal fun <A> slice(p: Parser<A>): Parser<String> = TODO()
 
-    internal abstract fun <A> succeed(a: A): Parser<A>
+    internal fun <A> succeed(a: A): Parser<A> = TODO()
 
-    internal abstract fun <A, B> flatMap(
+    internal fun <A, B> flatMap(
         p1: Parser<A>,
         f: (A) -> Parser<B>
-    ): Parser<B>
+    ): Parser<B> = TODO()
 
-    internal abstract fun <A> or(
+    internal fun <A> or(
         p1: Parser<out A>,
         p2: () -> Parser<out A>
-    ): Parser<A>
+    ): Parser<A> = TODO()
 
     // other combinators here
+
+    internal fun <A> many(pa: Parser<A>): Parser<List<A>> = TODO()
+
+    internal fun <A, B> map(pa: Parser<A>, f: (A) -> B): Parser<B> = TODO()
+
+    internal fun whitespace(): Parser<String> = TODO()
+
+    /**
+     * Match a string value in quotes but return it without quotes
+     */
+    internal fun quotedString(): Parser<String> = TODO()
 }
 
 abstract class ParsersDsl<PE> : Parsers<PE>() {
     // syntactic sugar here
+    fun <A, B> Parser<A>.flatMap(f: (A) -> Parser<B>): Parser<B> =
+        flatMap(this, f)
+
+    fun <A, B> Parser<A>.map(f: (A) -> B): Parser<B> = map(this, f)
+
+    infix fun <A> Parser<A>.or(that: Parser<A>): Parser<A> =
+        or(this) { that }
+
+    fun <A> Parser<A>.many(): Parser<List<A>> = many(this)
 }
 
 abstract class JSONParsers : ParsersDsl<ParseError>() {
-    val jsonParser: Parser<JSON> =
+    private val jnull: Parser<JSON> =
+        string("null").map { JNull as JSON }
 
-        SOLUTION_HERE()
+    private val jnumber: Parser<JSON> =
+        regex("\\d+").map { JNumber(it.toDouble()) as JSON }
+
+    private val jstring: Parser<JSON> =
+        quotedString().map {
+            JString(it.drop(1).dropLast(1)) as JSON
+        }
+
+    private val jboolean: Parser<JSON> =
+        string("true").map { JBoolean(true) as JSON } or
+            string("false").map { JBoolean(false) as JSON }
+
+    private val jarray: Parser<JSON> =
+        string("[")
+            .flatMap { whitespace() }
+            .flatMap { jsonParser }
+            .flatMap { first ->
+                whitespace()
+                    .flatMap { string(",") }
+                    .flatMap { whitespace() }
+                    .flatMap { jsonParser }
+                    .many()
+                    .map { following -> listOf(first) + following }
+            }
+            .flatMap { jsons ->
+                whitespace()
+                    .map { jsons }
+            }
+            .flatMap { jsons ->
+                string("]")
+                    .map { JArray(jsons) as JSON }
+            }
+
+    private val jkeyvalue: Parser<Pair<String, JSON>> =
+        quotedString()
+            .flatMap { key -> regex("\\s+:\\s+").map { key } }
+            .flatMap { key ->
+                jsonParser.map { json ->
+                    Pair(key, json)
+                }
+            }
+
+    private val jobject: Parser<JSON> =
+        string("{")
+            .flatMap { whitespace() }
+            .flatMap { jkeyvalue }
+            .flatMap { first ->
+                whitespace()
+                    .flatMap { string(",") }
+                    .flatMap { whitespace() }
+                    .flatMap { jkeyvalue }
+                    .many()
+                    .map { following -> listOf(first) + following }
+            }
+            .flatMap { keyValuePairLists ->
+                string("}")
+                    .map {
+                        JObject(keyValuePairLists.toMap()) as JSON
+                    }
+            }
+
+    val jsonParser: Parser<JSON> =
+        jnull or jnumber or jstring or jboolean or jarray or jobject
 }
 //end::init[]
