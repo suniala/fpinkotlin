@@ -101,8 +101,8 @@ abstract class JSONParsers : ParsersDsl<ParseError>() {
         regex("\\d+").map { JNumber(it.toDouble()) as JSON }
 
     private val jstring: Parser<JSON> =
-        quotedString().map {
-            JString(it.drop(1).dropLast(1)) as JSON
+        quotedString().map { withoutQuotes ->
+            JString(withoutQuotes) as JSON
         }
 
     private val jboolean: Parser<JSON> =
