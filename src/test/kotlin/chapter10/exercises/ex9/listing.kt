@@ -33,7 +33,8 @@ fun intOrdered(): Monoid<OrderedState<Int>> =
                 }.let {
                     when (it) {
                         is Some<OrderedState<Int>> -> it.t
-                        else -> throw RuntimeException("should not be here")
+                        else ->
+                            throw RuntimeException("should not be here")
                     }
                 }
             } else {
