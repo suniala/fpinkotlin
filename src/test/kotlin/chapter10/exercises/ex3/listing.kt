@@ -2,12 +2,19 @@ package chapter10.exercises.ex3
 
 import arrow.core.compose
 import chapter10.Monoid
-import utils.SOLUTION_HERE
 
 //tag::init1[]
-fun <A> endoMonoid(): Monoid<(A) -> A> =
+/**
+A function having the same argument and return type is sometimes called an endofunc-
+tion. (The Greek prefix endo- means within, in the sense that an endofunction’s
+codomain is within its domain.) Write a monoid for endofunctions.
+ */
+fun <A> endoMonoid(): Monoid<(A) -> A> = object : Monoid<(A) -> A> {
+    override fun combine(a1: (A) -> A, a2: (A) -> A): (A) -> A =
+        { a -> a1(a2(a)) }
 
-    SOLUTION_HERE()
+    override val nil: (A) -> A = { it }
+}
 //end::init1[]
 
 //tag::init2[]
