@@ -1,12 +1,16 @@
 package chapter10.exercises.ex16
 
 import arrow.Kind
+import chapter10.Cons
 import chapter10.List
 import chapter10.Monoid
 import chapter10.dual
 import chapter10.endoMonoid
-import utils.SOLUTION_HERE
 
+/**
+Any Foldable structure can be turned into a List . Write this convenience method for
+Foldable<F> using an existing method on the interface:
+ */
 interface Foldable<F> {
 
     fun <A, B> foldRight(fa: Kind<F, A>, z: B, f: (A, B) -> B): B =
@@ -20,7 +24,8 @@ interface Foldable<F> {
 
     //tag::init1[]
     fun <A> toList(fa: Kind<F, A>): List<A> =
-
-        SOLUTION_HERE()
+        foldRight(fa, List.empty()) { a, la ->
+            Cons(a, la)
+        }
     //end::init1[]
 }

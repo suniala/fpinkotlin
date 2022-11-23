@@ -1,21 +1,41 @@
 package chapter10.exercises.ex13
 
 import chapter10.ForList
+import chapter10.ListOf
 import chapter10.asConsList
-import chapter10.solutions.ex12.Foldable
+import chapter10.exercises.ex12.Foldable
+import chapter10.fix
 import chapter10.stringMonoid
 import io.kotlintest.properties.assertAll
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.WordSpec
 
 //tag::init1[]
-object ListFoldable : Foldable<ForList>
+/**
+Implement Foldable<ForList> using the Foldable<F> interface from the previous
+exercise.
+ */
+object ListFoldable : Foldable<ForList> {
+    override fun <A, B> foldRight(
+        fa: ListOf<A>,
+        z: B,
+        f: (A, B) -> B
+    ): B =
+        fa.fix().foldRight(z, f)
+
+    override fun <A, B> foldLeft(
+        fa: ListOf<A>,
+        z: B,
+        f: (B, A) -> B
+    ): B {
+        return fa.fix().foldLeft(z, f)
+    }
+}
 //end::init1[]
 
-//TODO: Enable tests by removing `!` prefix
 class Exercise13 : WordSpec({
     "ListFoldable" should {
-        "!foldRight" {
+        "foldRight" {
             assertAll<List<Int>> { ls ->
                 ListFoldable.foldRight(
                     ls.asConsList(),
@@ -24,7 +44,7 @@ class Exercise13 : WordSpec({
                 ) shouldBe ls.sum()
             }
         }
-        "!foldLeft" {
+        "foldLeft" {
             assertAll<List<Int>> { ls ->
                 ListFoldable.foldLeft(
                     ls.asConsList(),
@@ -32,7 +52,7 @@ class Exercise13 : WordSpec({
                     { b, a -> a + b }) shouldBe ls.sum()
             }
         }
-        "!foldMap" {
+        "foldMap" {
             assertAll<List<Int>> { ls ->
                 ListFoldable.foldMap(
                     ls.asConsList(),
