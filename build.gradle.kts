@@ -34,6 +34,7 @@ repositories {
 
 tasks.withType<KotlinCompile>().configureEach {
     kotlinOptions.suppressWarnings = true
+    kotlinOptions.jvmTarget = "1.8"
 }
 
 ktlint {
