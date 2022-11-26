@@ -12,7 +12,8 @@ foldLeft.
  */
 fun sumL(xs: List<Int>): Int = foldLeft(xs, 0) { b, a -> b + a }
 
-fun productL(xs: List<Double>): Double = foldLeft(xs, 1.0) { b, a -> b * a }
+fun productL(xs: List<Double>): Double =
+    foldLeft(xs, 1.0) { b, a -> b * a }
 
 fun <A> lengthL(xs: List<A>): Int = foldLeft(xs, 0) { b, _ -> b + 1 }
 // end::init[]

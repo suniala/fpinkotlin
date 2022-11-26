@@ -14,7 +14,8 @@ that modifies each element in a tree with a given function.
 fun <A, B> map(tree: Tree<A>, f: (A) -> B): Tree<B> = when (tree) {
     is Leaf -> Leaf(f(tree.value))
     is Branch -> Branch(map(tree.left, f), map(tree.right, f))
-}// end::init[]
+}
+// end::init[]
 
 class Exercise27 : WordSpec({
     "tree map" should {

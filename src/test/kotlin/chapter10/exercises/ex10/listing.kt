@@ -33,6 +33,7 @@ fun wcMonoid(): Monoid<WC> = object : Monoid<WC> {
                         Stub(a1.chars + a2.chars)
                     }
                 }
+
                 is Part -> {
                     val a1Parts = a1.chars.split(" ")
                     if (a1Parts.size > 1) {
@@ -42,6 +43,7 @@ fun wcMonoid(): Monoid<WC> = object : Monoid<WC> {
                     }
                 }
             }
+
             is Part -> when (a2) {
                 is Stub -> {
                     val a2Parts = a2.chars.split(" ")
@@ -51,6 +53,7 @@ fun wcMonoid(): Monoid<WC> = object : Monoid<WC> {
                         Part(a1.ls, a1.words, a1.rs + a2.chars)
                     }
                 }
+
                 is Part ->
                     if (a1.rs.isEmpty() && a2.ls.isEmpty()) {
                         Part(a1.ls, a1.words + a2.words, a2.rs)

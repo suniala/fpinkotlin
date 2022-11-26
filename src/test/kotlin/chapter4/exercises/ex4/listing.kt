@@ -18,10 +18,17 @@ contains None even once, the result of the function should be None ;
 otherwise the result should be Some with a list of all the values.
  */
 fun <A> sequence(xs: List<Option<A>>): Option<List<A>> {
-    fun seq(rem: List<Option<A>>, acc: List<A>): Option<List<A>> = when (rem) {
-        is Cons<Option<A>> -> rem.head.flatMap { seq(rem.tail, append(acc, List.of(it))) }
-        is Nil -> Some(acc)
-    }
+    fun seq(rem: List<Option<A>>, acc: List<A>): Option<List<A>> =
+        when (rem) {
+            is Cons<Option<A>> -> rem.head.flatMap {
+                seq(
+                    rem.tail,
+                    append(acc, List.of(it))
+                )
+            }
+
+            is Nil -> Some(acc)
+        }
 
     return seq(xs, List.empty())
 }

@@ -18,9 +18,11 @@ fun <A, B> foldMap(la: List<A>, m: Monoid<B>, f: (A) -> B): B =
         0 -> {
             m.nil
         }
+
         1 -> {
             f(la.head)
         }
+
         else -> {
             val (subLa, subRa) = la.splitAt(la.size / 2)
             val lb = foldMap(subLa, m, f)

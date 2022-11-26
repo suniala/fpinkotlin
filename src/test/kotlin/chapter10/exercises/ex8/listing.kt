@@ -37,9 +37,11 @@ fun <A, B> parFoldMap(
         0 -> {
             pm.nil
         }
+
         1 -> {
             unit(f(la.head))
         }
+
         else -> {
             val (subLa, subRa) = la.splitAt(la.size / 2)
             val lb = parFoldMap(subLa, pm, f)

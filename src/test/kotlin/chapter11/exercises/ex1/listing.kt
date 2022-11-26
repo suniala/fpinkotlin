@@ -80,12 +80,17 @@ class Exercise1 : WordSpec({
         "option" {
             val monad = Monads.optionMonad()
             monad.unit("1") shouldBe Option.of("1")
-            monad.map(Option.of(42)) { v -> "foo-$v" } shouldBe Option.of("foo-42")
-            monad.flatMap(Option.of(42)) { v -> Option.of("foo-$v") } shouldBe Option.of(
-                "foo-42"
-            )
-            monad.flatMap(Option.of(42)) { Option.empty<String>() } shouldBe Option.empty()
-            monad.flatMap(Option.empty<Int>()) { v -> Option.of("foo-$v") } shouldBe Option.empty()
+            monad.map(Option.of(42)) { v -> "foo-$v" }
+                .shouldBe(Option.of("foo-42"))
+            monad.flatMap(Option.of(42)) { v -> Option.of("foo-$v") }
+                .shouldBe(Option.of("foo-42"))
+            monad.flatMap(Option.of(42)) { Option.empty<String>() }
+                .shouldBe(Option.empty())
+            monad
+                .flatMap(Option.empty<Int>()) { v ->
+                    Option.of("foo-$v")
+                }
+                .shouldBe(Option.empty())
         }
     }
 })

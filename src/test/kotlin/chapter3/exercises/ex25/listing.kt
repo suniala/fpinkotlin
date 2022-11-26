@@ -13,7 +13,10 @@ Write a function maximum that returns the maximum element in a Tree<Int> .
 fun maximum(tree: Tree<Int>): Int {
     fun go(acc: Int, rem: Tree<Int>): Int = when (rem) {
         is Leaf -> maxOf(acc, rem.value)
-        is Branch -> maxOf(acc, maxOf(go(acc, rem.left), go(acc, rem.right)))
+        is Branch -> maxOf(
+            acc,
+            maxOf(go(acc, rem.left), go(acc, rem.right))
+        )
     }
     return go(Int.MIN_VALUE, tree)
 }

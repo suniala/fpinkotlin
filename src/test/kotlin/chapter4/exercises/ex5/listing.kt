@@ -70,7 +70,8 @@ class Exercise5 : WordSpec({
     }
 
     "sequence" should {
-        "turn an empty list of options into an some option of an empty list" {
+        """turn an empty list of options into an some option of an
+            empty list""" {
             val lo = List.empty<Option<Int>>()
             sequence(lo) shouldBe Some(List.empty<Int>())
         }

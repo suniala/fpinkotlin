@@ -25,6 +25,7 @@ fun wordCount(s: String): Int {
                 wc.chars.split(" ").size
             else
                 0
+
         is Part -> wc.words +
             min(wc.ls.length, 1) +
             min(wc.rs.length, 1)
