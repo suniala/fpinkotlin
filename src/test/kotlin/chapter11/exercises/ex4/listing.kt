@@ -4,8 +4,10 @@ import arrow.Kind
 import chapter10.Cons
 import chapter10.List
 import chapter11.Functor
-import utils.SOLUTION_HERE
 
+/**
+Implement replicateM to generate a Kind<F, List<A>> , with the list being of length n .
+ */
 interface Monad<F> : Functor<F> {
 
     fun <A> unit(a: A): Kind<F, A>
@@ -19,21 +21,18 @@ interface Monad<F> : Functor<F> {
 
     fun <A> sequence(lfa: List<Kind<F, A>>): Kind<F, List<A>> =
         lfa.foldRight(
-            unit(List.empty<A>()),
-            { fa: Kind<F, A>, fla: Kind<F, List<A>> ->
-                map2(fa, fla) { a: A, la: List<A> -> Cons(a, la) }
-            }
-        )
+            unit(List.empty<A>())
+        ) { fa: Kind<F, A>, fla: Kind<F, List<A>> ->
+            map2(fa, fla) { a: A, la: List<A> -> Cons(a, la) }
+        }
 
     //tag::init1[]
     fun <A> replicateM(n: Int, ma: Kind<F, A>): Kind<F, List<A>> =
-
-        SOLUTION_HERE()
+        sequence(List.fill(n, ma))
     //end::init1[]
 
     //tag::init2[]
     fun <A> _replicateM(n: Int, ma: Kind<F, A>): Kind<F, List<A>> =
-
-        SOLUTION_HERE()
+        replicateM(n, ma)
     //end::init2[]
 }
