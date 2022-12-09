@@ -10,7 +10,8 @@ Implement forAll , which checks that all elements in the Stream match a
 given predicate. Your implementation should terminate the traversal as
 soon as it encounters a non-matching value.
  */
-fun <A> Stream<A>.forAll(p: (A) -> Boolean): Boolean = foldRight({ true }, { a, b -> p(a) && b() })
+fun <A> Stream<A>.forAll(p: (A) -> Boolean): Boolean =
+    foldRight({ true }, { a, b -> p(a) && b() })
 //end::init[]
 
 class Exercise4 : WordSpec({

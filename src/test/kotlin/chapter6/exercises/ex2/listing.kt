@@ -16,7 +16,10 @@ class Exercise2 : WordSpec({
     //tag::init[]
     fun double(rng: RNG): Pair<Double, RNG> {
         val (int, nextRng) = nonNegativeInt(rng)
-        return Pair(int.toDouble() / (Int.MAX_VALUE.toDouble() + 1), nextRng)
+        return Pair(
+            int.toDouble() / (Int.MAX_VALUE.toDouble() + 1),
+            nextRng
+        )
     }
     //end::init[]
 

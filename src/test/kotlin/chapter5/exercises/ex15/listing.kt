@@ -30,7 +30,8 @@ class Exercise15 : WordSpec({
         }
     //end::tails[]
 
-    fun <A, B> List<A>.map(f: (A) -> B): List<B> = chapter3.exercises.ex17.map(this, f)
+    fun <A, B> List<A>.map(f: (A) -> B): List<B> =
+        chapter3.exercises.ex17.map(this, f)
 
     "Stream.tails" should {
         "return the stream of suffixes of the input sequence" {

@@ -56,7 +56,6 @@ class Exercise7 : WordSpec({
         return sequence(fs)(rng)
     }
 
-
     "sequence" should {
 
         "combine the results of many actions using recursion" {

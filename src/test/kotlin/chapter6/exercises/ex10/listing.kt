@@ -29,22 +29,24 @@ data class State<S, out A>(val run: (S) -> Pair<A, S>) {
             f: (A, B) -> C
         ): State<S, C> =
             flatMap(ra) { a ->
-                    flatMap(rb) { b ->
-                        State<S, C> { s -> Pair(f(a, b), s) }
-                    }
+                flatMap(rb) { b ->
+                    State<S, C> { s -> Pair(f(a, b), s) }
                 }
+            }
 
-        fun <S, A, B> flatMap(f: State<S, A>, g: (A) -> State<S, B>): State<S, B> = State { s ->
+        fun <S, A, B> flatMap(f: State<S, A>, g: (A) -> State<S, B>):
+            State<S, B> = State { s ->
             val (a, s2) = f.run(s)
             g(a).run(s2)
         }
 
-        fun <S, A> sequence(fs: List<State<S, A>>): State<S, List<A>> = State { s ->
-            foldLeft(fs, Pair(Nil as List<A>, s)) { b, a ->
-                val (va, rng2) = a.run(b.second)
-                Pair(append(b.first, List.of(va)), rng2)
+        fun <S, A> sequence(fs: List<State<S, A>>): State<S, List<A>> =
+            State { s ->
+                foldLeft(fs, Pair(Nil as List<A>, s)) { b, a ->
+                    val (va, rng2) = a.run(b.second)
+                    Pair(append(b.first, List.of(va)), rng2)
+                }
             }
-        }
     }
 
     fun <B> map(f: (A) -> B): State<S, B> = flatMap { a ->

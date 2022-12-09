@@ -14,11 +14,12 @@ results, and returns a new action that combines them:
 class Exercise6 : WordSpec({
 
     //tag::init[]
-    fun <A, B, C> map2(ra: Rand<A>, rb: Rand<B>, f: (A, B) -> C): Rand<C> = { rng ->
-        val (rav, rng2) = ra(rng)
-        val (rbv, rng3) = rb(rng2)
-        Pair(f(rav, rbv), rng3)
-    }
+    fun <A, B, C> map2(ra: Rand<A>, rb: Rand<B>, f: (A, B) -> C): Rand<C> =
+        { rng ->
+            val (rav, rng2) = ra(rng)
+            val (rbv, rng3) = rb(rng2)
+            Pair(f(rav, rbv), rng3)
+        }
     //end::init[]
 
     "map2" should {

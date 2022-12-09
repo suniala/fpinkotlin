@@ -16,16 +16,17 @@ that match the given predicate.
 class Exercise3 : WordSpec({
 
     //tag::init[]
-    fun <A> Stream<A>.takeWhile(p: (A) -> Boolean): Stream<A> =when (this) {
-        is Empty -> empty()
-        is Cons<A> -> {
-            if (p(head())) {
-                Cons(head) { tail().takeWhile(p) }
-            } else {
-                empty()
+    fun <A> Stream<A>.takeWhile(p: (A) -> Boolean): Stream<A> =
+        when (this) {
+            is Empty -> empty()
+            is Cons<A> -> {
+                if (p(head())) {
+                    Cons(head) { tail().takeWhile(p) }
+                } else {
+                    empty()
+                }
             }
         }
-    }
     //end::init[]
 
     "Stream.takeWhile" should {

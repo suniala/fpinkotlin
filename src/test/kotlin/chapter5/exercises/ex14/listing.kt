@@ -22,7 +22,9 @@ class Exercise14 : WordSpec({
         is Empty -> false
         is Cons<A> -> this.zipAll(that)
             .takeWhile { (_, sub) -> sub is Some<A> }
-            .forAll { (main, sub) -> main is Some<A> && sub is Some<A> && main.get == sub.get }
+            .forAll { (main, sub) ->
+                main is Some<A> && sub is Some<A> && main.get == sub.get
+            }
     }
     //end::startswith[]
 

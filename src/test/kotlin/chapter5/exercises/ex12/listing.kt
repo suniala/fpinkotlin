@@ -21,7 +21,8 @@ Write fibs , from , constant , and ones in terms of unfold .
 class Exercise12 : WordSpec({
 
     //tag::fibs[]
-    fun fibs(): Stream<Int> = unfold(Pair(0, 1)) { (a, b) -> Some(Pair(a, Pair(b, a + b))) }
+    fun fibs(): Stream<Int> =
+        unfold(Pair(0, 1)) { (a, b) -> Some(Pair(a, Pair(b, a + b))) }
     //end::fibs[]
 
     //tag::from[]
@@ -45,7 +46,8 @@ class Exercise12 : WordSpec({
 
     "from" should {
         "return a Stream of ever incrementing numbers" {
-            from(5).take(5).toList() shouldBe List.of(5, 6, 7, 8, 9)
+            from(5).take(5).toList() shouldBe
+                List.of(5, 6, 7, 8, 9)
         }
     }
 

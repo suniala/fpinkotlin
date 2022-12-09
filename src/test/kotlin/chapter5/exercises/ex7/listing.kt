@@ -16,32 +16,36 @@ method should be non-strict in its argument.
 class Exercise7 : WordSpec({
 
     //tag::map[]
-    fun <A, B> Stream<A>.map(f: (A) -> B): Stream<B> = foldRight({ empty() }, { a, b -> Cons({ f(a) }, b) })
+    fun <A, B> Stream<A>.map(f: (A) -> B): Stream<B> =
+        foldRight({ empty() }, { a, b -> Cons({ f(a) }, b) })
     //end::map[]
 
     //tag::filter[]
-    fun <A> Stream<A>.filter(f: (A) -> Boolean): Stream<A> = foldRight({ empty() },
-        { a, b ->
-            if (f(a)) {
-                Cons({ a }, b)
-            } else {
-                b()
-            }
-        })
+    fun <A> Stream<A>.filter(f: (A) -> Boolean): Stream<A> =
+        foldRight({ empty() },
+            { a, b ->
+                if (f(a)) {
+                    Cons({ a }, b)
+                } else {
+                    b()
+                }
+            })
     //end::filter[]
 
     //tag::append[]
-    fun <A> Stream<A>.append(sa: () -> Stream<A>): Stream<A> = this.foldRight(sa) { a, b ->
-        cons(
-            { a },
-            b
-        )
-    }
+    fun <A> Stream<A>.append(sa: () -> Stream<A>): Stream<A> =
+        this.foldRight(sa) { a, b ->
+            cons(
+                { a },
+                b
+            )
+        }
     //end::append[]
 
     //tag::flatmap[]
-    fun <A, B> Stream<A>.flatMap(f: (A) -> Stream<B>): Stream<B> = foldRight({ empty() },
-        { a, b -> f(a).foldRight(b) { a2, b2 -> Cons({ a2 }, b2) } })
+    fun <A, B> Stream<A>.flatMap(f: (A) -> Stream<B>): Stream<B> =
+        foldRight({ empty() },
+            { a, b -> f(a).foldRight(b) { a2, b2 -> Cons({ a2 }, b2) } })
     //end::flatmap[]
 
     "Stream.map" should {
