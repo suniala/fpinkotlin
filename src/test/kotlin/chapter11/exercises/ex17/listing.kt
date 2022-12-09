@@ -5,7 +5,6 @@ import chapter11.State
 import chapter11.StateMonad
 import chapter11.StateOf
 import chapter11.fix
-import utils.SOLUTION_HERE
 
 val intMonad: StateMonad<Int> = object : StateMonad<Int> {
     override fun <A> unit(a: A): StateOf<Int, A> =
@@ -18,6 +17,11 @@ val intMonad: StateMonad<Int> = object : StateMonad<Int> {
         fa.fix().flatMap { a -> f(a).fix() }
 }
 
+/**
+Now that we have a State monad, try it to see how it behaves. Declare some values of
+replicateM , map2 , and sequence with type declarations using intMonad . Describe how
+each one behaves under the covers.
+ */
 fun main() {
 
     val stateA: State<Int, Int> = State { a: Int -> a to (10 + a) }
@@ -25,15 +29,23 @@ fun main() {
 
     //tag::init[]
     fun replicateIntState(): StateOf<Int, List<Int>> =
-
-        SOLUTION_HERE()
+        intMonad.replicateM(5, stateA)
 
     fun map2IntState(): StateOf<Int, Int> =
-
-        SOLUTION_HERE()
+        intMonad.map2(stateA, stateB) { a, b ->
+            a + b
+        }
 
     fun sequenceIntState(): StateOf<Int, List<Int>> =
-
-        SOLUTION_HERE()
+        intMonad.sequence(List.of(stateA, stateB))
     //end::init[]
+
+    val r: Pair<List<Int>, Int> = replicateIntState().fix().run(3)
+    println(r)
+
+    val m: Pair<Int, Int> = map2IntState().fix().run(3)
+    println(m)
+
+    val s: Pair<List<Int>, Int> = sequenceIntState().fix().run(3)
+    println(s)
 }
